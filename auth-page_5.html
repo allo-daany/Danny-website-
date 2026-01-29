@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Spa Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #8b7355 0%, #a08b6e 50%, #c4b59d 100%);
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, #8b7355 0%, #a08b6e 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .auth-header .logo {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+
+        .auth-header .logo span {
+            font-weight: 600;
+        }
+
+        .auth-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .auth-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .auth-form {
+            padding: 40px 30px;
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 30px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #8b7355;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #8b7355;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(139, 115, 85, 0.1);
+        }
+
+        .input-group input::placeholder {
+            color: #aaa;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #8b7355 0%, #a08b6e 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139, 115, 85, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .submit-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            top: 50%;
+            left: 50%;
+            margin-left: -12px;
+            margin-top: -12px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .message {
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            line-height: 1.5;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: flex;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: flex;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: flex;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .user-info {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+        }
+
+        .user-info.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .user-info h3 {
+            color: #155724;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .user-info p {
+            color: #155724;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .user-info .email {
+            font-weight: 600;
+            color: #0d4017;
+        }
+
+        .logout-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.online {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+        }
+
+        .waiting-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .waiting-text .dots {
+            display: inline-block;
+        }
+
+        .waiting-text .dots::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="logo">🧖 Spa Finder</div>
+            <h1>Welcome</h1>
+            <p>Sign in to discover the best spas near you</p>
+        </div>
+
+        <div class="auth-form">
+            <div id="formSection">
+                <div class="tab-container">
+                    <button class="tab-btn active" data-tab="login">Sign In</button>
+                    <button class="tab-btn" data-tab="register">Create Account</button>
+                </div>
+
+                <div id="message" class="message"></div>
+
+                <form id="authForm">
+                    <div id="nameGroup" class="input-group hidden">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" placeholder="Enter your full name">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">Sign In</button>
+                </form>
+            </div>
+
+            <div id="userInfo" class="user-info">
+                <h3>🎉 Welcome!</h3>
+                <p>You are logged in as:</p>
+                <p class="email" id="loggedInEmail"></p>
+                <p id="actionType"></p>
+                <button class="logout-btn" id="logoutBtn">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - Your n8n webhook URL
+        const WEBHOOK_URL = 'https://n8n.srv909914.hstgr.cloud/webhook/login-auth';
+
+        // State
+        let currentTab = 'login';
+
+        // DOM Elements
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const authForm = document.getElementById('authForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageEl = document.getElementById('message');
+        const nameGroup = document.getElementById('nameGroup');
+        const formSection = document.getElementById('formSection');
+        const userInfo = document.getElementById('userInfo');
+        const loggedInEmail = document.getElementById('loggedInEmail');
+        const actionType = document.getElementById('actionType');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Tab switching
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTab = btn.dataset.tab;
+                
+                if (currentTab === 'register') {
+                    nameGroup.classList.remove('hidden');
+                    submitBtn.textContent = 'Create Account';
+                } else {
+                    nameGroup.classList.add('hidden');
+                    submitBtn.textContent = 'Sign In';
+                }
+                
+                hideMessage();
+            });
+        });
+
+        // Form submission
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value || 'New User';
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Validation
+            if (!email) {
+                showMessage('Please enter your email address', 'error');
+                return;
+            }
+
+            if (!password) {
+                showMessage('Please enter your password', 'error');
+                return;
+            }
+
+            // Prepare payload
+            const payload = {
+                name: name,
+                email: email,
+                password: password
+            };
+
+            // Show loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            showMessage('<span class="waiting-text">Waiting for server response<span class="dots"></span></span>', 'info');
+
+            try {
+                // Send request and wait for response
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Response received:', data);
+
+                // Parse the response
+                handleAuthResponse(data, email);
+
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage(`Connection error: ${error.message}. Please try again.`, 'error');
+            } finally {
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Handle authentication response
+        function handleAuthResponse(data, identifier) {
+            const output = data.output || '';
+            
+            // Check for successful login
+            if (output.toLowerCase().includes('login successful') || 
+                (output.toLowerCase().includes('password matches') && output.toLowerCase().includes('success'))) {
+                
+                // Extract email from response if possible
+                const emailMatch = output.match(/["']([^\s"']+@[^\s"']+)["']/i);
+                const userEmail = emailMatch ? emailMatch[1] : identifier;
+                
+                showSuccessState(userEmail, 'login');
+                showMessage('Login successful! Welcome back.', 'success');
+            }
+            // Check for successful registration
+            else if (output.toLowerCase().includes('registration successful') || 
+                     output.toLowerCase().includes('new user created')) {
+                
+                // Extract email from response if possible
+                const emailMatch = output.match(/["']?([^\s"']+@[^\s"']+)["']?/i);
+                const userEmail = emailMatch ? emailMatch[1] : identifier;
+                
+                showSuccessState(userEmail, 'registration');
+                showMessage('Account created successfully! You are now logged in.', 'success');
+            }
+            // Check for failed login (password mismatch)
+            else if (output.toLowerCase().includes('invalid') || 
+                     output.toLowerCase().includes('mismatch') ||
+                     output.toLowerCase().includes('does not match') ||
+                     output.toLowerCase().includes('failed') ||
+                     output.toLowerCase().includes('incorrect')) {
+                
+                showMessage('Invalid credentials. Please check your password and try again.', 'error');
+            }
+            // Handle other responses
+            else {
+                // Try to parse JSON from output if it contains status
+                if (output.includes('"status"')) {
+                    try {
+                        const jsonMatch = output.match(/\{[\s\S]*"status"[\s\S]*\}/);
+                        if (jsonMatch) {
+                            const parsed = JSON.parse(jsonMatch[0]);
+                            if (parsed.status === 'success') {
+                                showSuccessState(parsed.user_email || identifier, parsed.action || 'login');
+                                showMessage(parsed.message || 'Authentication successful!', 'success');
+                                return;
+                            } else {
+                                showMessage(parsed.message || 'Authentication failed.', 'error');
+                                return;
+                            }
+                        }
+                    } catch (e) {
+                        console.log('Could not parse embedded JSON');
+                    }
+                }
+                
+                // If output contains success indicators, treat as success
+                if (output.toLowerCase().includes('success')) {
+                    showSuccessState(identifier, currentTab === 'register' ? 'registration' : 'login');
+                    showMessage('Authentication successful!', 'success');
+                } else {
+                    // Default: show the raw output as info
+                    showMessage(output || 'Unexpected response from server.', 'info');
+                }
+            }
+        }
+
+        // Show success state and redirect to home page
+        function showSuccessState(email, action) {
+            // Save user data to localStorage
+            const userData = {
+                email: email,
+                name: document.getElementById('name').value || email.split('@')[0],
+                action: action,
+                justLoggedIn: true,
+                loginTime: new Date().toISOString()
+            };
+            localStorage.setItem('spaUser', JSON.stringify(userData));
+            
+            // Show success message briefly
+            formSection.classList.add('hidden');
+            userInfo.classList.add('show');
+            loggedInEmail.textContent = email;
+            
+            if (action === 'registration') {
+                actionType.textContent = '✨ New account created - Redirecting...';
+            } else {
+                actionType.textContent = '🔐 Logged in successfully - Redirecting...';
+            }
+            
+            // Redirect to home page after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'home-page.html';
+            }, 2000);
+        }
+
+        // Logout handler
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('spaUser');
+            formSection.classList.remove('hidden');
+            userInfo.classList.remove('show');
+            authForm.reset();
+            hideMessage();
+            
+            // Reset to login tab
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabBtns[0].classList.add('active');
+            currentTab = 'login';
+            nameGroup.classList.add('hidden');
+            submitBtn.textContent = 'Sign In';
+        });
+
+        // Helper functions
+        function showMessage(text, type) {
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: '⏳'
+            };
+            
+            if (text.includes('<span')) {
+                messageEl.innerHTML = `<span>${icons[type] || ''}</span>${text}`;
+            } else {
+                messageEl.innerHTML = `<span>${icons[type] || ''}</span><span>${text}</span>`;
+            }
+            messageEl.className = `message ${type}`;
+        }
+
+        function hideMessage() {
+            messageEl.className = 'message';
+            messageEl.innerHTML = '';
+        }
+    </script>
+</body>
+</html>
